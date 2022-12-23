@@ -1,0 +1,801 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/strict.dtd">
+<html>
+<head>
+<META http-equiv=Content-Type content="text/html; charset=UTF-8">
+<title>Exported from Notepad++</title>
+<style type="text/css">
+span {
+	font-family: 'Courier New';
+	font-size: 10pt;
+	color: #000000;
+}
+.sc0 {
+}
+.sc1 {
+	color: #008000;
+}
+.sc2 {
+	font-weight: bold;
+	color: #0000FF;
+}
+.sc3 {
+	color: #8000FF;
+}
+.sc4 {
+	color: #0080FF;
+}
+.sc5 {
+	color: #FF8000;
+}
+.sc6 {
+	color: #808080;
+}
+.sc7 {
+	color: #808080;
+}
+.sc8 {
+	font-weight: bold;
+	color: #000080;
+}
+.sc9 {
+}
+.sc10 {
+	color: #804000;
+}
+</style>
+</head>
+<body>
+<div style="float: left; white-space: pre; line-height: 1; background: #FFFFFF; "><span class="sc3">rm</span><span class="sc8">(</span><span class="sc3">list</span><span class="sc8">=</span><span class="sc3">ls</span><span class="sc8">())</span><span class="sc0">
+</span><span class="sc1">#import the library </span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc9">dplyr</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc6">"tidyverse"</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc6">"ggplot2"</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc6">"gridExtra"</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc6">"dummies"</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc6">"gplots"</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc9">gains</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc9">caret</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc9">ROCR</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc9">randomForest</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc9">rpart</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc9">rpart.plot</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc9">caret</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc9">e1071</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc9">ranger</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc9">DMwR2</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc9">smotefamily</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc9">ROSE</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc9">pROC</span><span class="sc8">)</span><span class="sc0">
+
+
+</span><span class="sc1">#import the dataset</span><span class="sc0">
+</span><span class="sc3">df</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">read.csv</span><span class="sc8">(</span><span class="sc6">"stroke.csv"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#head of stroke </span><span class="sc0">
+</span><span class="sc3">head</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Names of df </span><span class="sc0">
+</span><span class="sc3">names</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#dropping the id column</span><span class="sc0">
+</span><span class="sc3">df</span><span class="sc8">&lt;-</span><span class="sc3">subset</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc0">,</span><span class="sc9">select</span><span class="sc8">=(-</span><span class="sc9">id</span><span class="sc8">))</span><span class="sc0">
+</span><span class="sc3">head</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc3">df</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">df</span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc3">filter</span><span class="sc8">(</span><span class="sc9">gender</span><span class="sc8">!=</span><span class="sc6">"Other"</span><span class="sc8">)</span><span class="sc0">
+
+
+</span><span class="sc1">#EDA </span><span class="sc0">
+</span><span class="sc1">#View of df</span><span class="sc0">
+</span><span class="sc9">View</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Checking the structure of df </span><span class="sc0">
+</span><span class="sc3">str</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#BMI has NA values </span><span class="sc0">
+</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">bmi</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">as.integer</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">bmi</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Changing the datatype of the gender, ever_married, Smoking status to factors </span><span class="sc0">
+</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">gender</span><span class="sc8">&lt;-</span><span class="sc9">as.factor</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">gender</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">ever_married</span><span class="sc8">&lt;-</span><span class="sc9">as.factor</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">ever_married</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">work_type</span><span class="sc8">&lt;-</span><span class="sc9">as.factor</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">work_type</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">Residence_type</span><span class="sc8">&lt;-</span><span class="sc9">as.factor</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">Residence_type</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">smoking_status</span><span class="sc8">&lt;-</span><span class="sc9">as.factor</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">smoking_status</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">&lt;-</span><span class="sc9">as.factor</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">heart_disease</span><span class="sc8">&lt;-</span><span class="sc9">as.factor</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">heart_disease</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">hypertension</span><span class="sc8">&lt;-</span><span class="sc9">as.factor</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">hypertension</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#checking if there is any null value in the dataset </span><span class="sc0">
+</span><span class="sc3">any</span><span class="sc8">(</span><span class="sc9">is.na</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc8">))</span><span class="sc0">
+
+</span><span class="sc1">#number of na's in bmi </span><span class="sc0">
+</span><span class="sc3">length</span><span class="sc8">(</span><span class="sc3">which</span><span class="sc8">(</span><span class="sc9">is.na</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc8">$</span><span class="sc9">bmi</span><span class="sc8">)))</span><span class="sc0">
+
+</span><span class="sc1">#Doing median imputation for fixing null value </span><span class="sc0">
+</span><span class="sc9">df1</span><span class="sc8">&lt;-</span><span class="sc3">df</span><span class="sc0">
+</span><span class="sc9">df_mean</span><span class="sc8">&lt;-</span><span class="sc3">df</span><span class="sc0">
+</span><span class="sc3">nrow</span><span class="sc8">(</span><span class="sc3">df</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#removing the missing values of the bmi </span><span class="sc0">
+</span><span class="sc9">df2</span><span class="sc8">&lt;-</span><span class="sc9">na.omit</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Checking for na after the values are dropped</span><span class="sc0">
+</span><span class="sc3">any</span><span class="sc8">(</span><span class="sc9">is.na</span><span class="sc8">(</span><span class="sc9">df2</span><span class="sc8">))</span><span class="sc0">
+</span><span class="sc3">nrow</span><span class="sc8">(</span><span class="sc9">df2</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#calculating the median</span><span class="sc0">
+</span><span class="sc9">med</span><span class="sc8">&lt;-</span><span class="sc3">median</span><span class="sc8">(</span><span class="sc9">df2</span><span class="sc8">$</span><span class="sc9">bmi</span><span class="sc8">)</span><span class="sc0">;</span><span class="sc9">med</span><span class="sc0">
+</span><span class="sc9">Mean</span><span class="sc8">&lt;-</span><span class="sc3">mean</span><span class="sc8">(</span><span class="sc9">df2</span><span class="sc8">$</span><span class="sc9">bmi</span><span class="sc8">)</span><span class="sc0">;</span><span class="sc9">Mean</span><span class="sc0">
+
+</span><span class="sc1">#imputing the mean value </span><span class="sc0">
+</span><span class="sc9">df_mean</span><span class="sc8">$</span><span class="sc9">bmi</span><span class="sc8">[</span><span class="sc9">is.na</span><span class="sc8">(</span><span class="sc9">df_mean</span><span class="sc8">$</span><span class="sc9">bmi</span><span class="sc8">)]&lt;-</span><span class="sc9">Mean</span><span class="sc0">
+
+</span><span class="sc1">#Imputing the median value </span><span class="sc0">
+</span><span class="sc9">df1</span><span class="sc8">$</span><span class="sc9">bmi</span><span class="sc8">[</span><span class="sc9">is.na</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc8">$</span><span class="sc9">bmi</span><span class="sc8">)]&lt;-</span><span class="sc9">med</span><span class="sc0">
+
+</span><span class="sc1">#checking the value for bmi </span><span class="sc0">
+</span><span class="sc3">any</span><span class="sc8">(</span><span class="sc9">is.na</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc8">$</span><span class="sc9">bmi</span><span class="sc8">))</span><span class="sc0">
+
+</span><span class="sc1">#Checking the structure of the dataframe</span><span class="sc0">
+</span><span class="sc3">str</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc3">unique</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc8">$</span><span class="sc9">work_type</span><span class="sc8">)</span><span class="sc0">
+
+
+</span><span class="sc1">#df1 =&gt; median imputed value </span><span class="sc0">
+</span><span class="sc1">#df2 =&gt; missing values dropped </span><span class="sc0">
+
+</span><span class="sc1">#Performing the Exploratory Data Analysis</span><span class="sc0">
+</span><span class="sc1">#Creating a bar plot fot gender VS stroke</span><span class="sc0">
+</span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">gender</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_bar</span><span class="sc8">(</span><span class="sc9">position</span><span class="sc8">=</span><span class="sc6">"dodge"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#creating a bar plot for hypertension vs stroke</span><span class="sc0">
+</span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">hypertension</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_bar</span><span class="sc8">(</span><span class="sc9">position</span><span class="sc8">=</span><span class="sc6">"dodge"</span><span class="sc8">)</span><span class="sc0">
+
+
+</span><span class="sc1">#Creating the bar plot for heart disease</span><span class="sc0">
+</span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">heart_disease</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_bar</span><span class="sc8">(</span><span class="sc9">position</span><span class="sc8">=</span><span class="sc6">"dodge"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Creating the bar plot for worktype </span><span class="sc0">
+</span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">work_type</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_bar</span><span class="sc8">(</span><span class="sc9">position</span><span class="sc8">=</span><span class="sc6">"dodge"</span><span class="sc8">)</span><span class="sc0">
+
+
+</span><span class="sc1">#Creating a barplot for the marital status of the people</span><span class="sc0">
+</span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">ever_married</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_bar</span><span class="sc8">(</span><span class="sc9">position</span><span class="sc8">=</span><span class="sc6">"dodge"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Creating a bar plot for the smoking status and the stroke </span><span class="sc0">
+</span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">smoking_status</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_bar</span><span class="sc8">(</span><span class="sc9">position</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"dodge"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Inference from the above plot is that the number of people who get stroke when compared to the entire population</span><span class="sc0">
+
+</span><span class="sc1">#So now comparing the within the population of people who got stroke </span><span class="sc0">
+
+</span><span class="sc1">#Comparing the proportions within the gender among the people who got stroke</span><span class="sc0">
+</span><span class="sc9">data_proportion_gender</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+                  </span><span class="sc9">group_by</span><span class="sc8">(</span><span class="sc9">gender</span><span class="sc8">)</span><span class="sc10">%&gt;%</span><span class="sc0">
+                  </span><span class="sc9">summarise</span><span class="sc8">(</span><span class="sc9">prop</span><span class="sc8">=</span><span class="sc3">sum</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">==</span><span class="sc5">1</span><span class="sc8">)/</span><span class="sc3">length</span><span class="sc8">(</span><span class="sc9">gender</span><span class="sc8">))</span><span class="sc0">
+
+</span><span class="sc9">g1</span><span class="sc8">&lt;-</span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">data_proportion_gender</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">gender</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">prop</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">gender</span><span class="sc8">))+</span><span class="sc9">geom_col</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">g1</span><span class="sc0">
+</span><span class="sc1">#comparing the proportions within the different married type who got stroke </span><span class="sc0">
+</span><span class="sc9">data_proportion_married</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">df1</span><span class="sc10">%&gt;%</span><span class="sc0">
+                          </span><span class="sc9">group_by</span><span class="sc8">(</span><span class="sc9">ever_married</span><span class="sc8">)</span><span class="sc10">%&gt;%</span><span class="sc0">
+                          </span><span class="sc9">summarise</span><span class="sc8">(</span><span class="sc9">prop</span><span class="sc8">=</span><span class="sc3">sum</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">==</span><span class="sc5">1</span><span class="sc8">)/</span><span class="sc3">length</span><span class="sc8">(</span><span class="sc9">ever_married</span><span class="sc8">))</span><span class="sc0">
+
+</span><span class="sc9">g2</span><span class="sc8">&lt;-</span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">data_proportion_married</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">ever_married</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">prop</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">ever_married</span><span class="sc8">))+</span><span class="sc9">geom_col</span><span class="sc8">()</span><span class="sc0">
+
+</span><span class="sc1">#Comparing the proportions of people who have hypertension  who got stroke </span><span class="sc0">
+</span><span class="sc9">data_proportion_hypertension</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">df1</span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">group_by</span><span class="sc8">(</span><span class="sc9">hypertension</span><span class="sc8">)</span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">summarise</span><span class="sc8">(</span><span class="sc9">prop</span><span class="sc8">=</span><span class="sc3">sum</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">==</span><span class="sc5">1</span><span class="sc8">)/</span><span class="sc3">length</span><span class="sc8">(</span><span class="sc9">hypertension</span><span class="sc8">))</span><span class="sc0">
+
+</span><span class="sc9">g3</span><span class="sc8">&lt;-</span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">data_proportion_hypertension</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">hypertension</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">prop</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">hypertension</span><span class="sc8">))+</span><span class="sc9">geom_col</span><span class="sc8">()</span><span class="sc0">
+
+
+</span><span class="sc1">#Comparing the proportions of people who have the heart diseases who got stroke </span><span class="sc0">
+</span><span class="sc9">data_proportion_heart_disease</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">df1</span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">group_by</span><span class="sc8">(</span><span class="sc9">heart_disease</span><span class="sc8">)</span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">summarise</span><span class="sc8">(</span><span class="sc9">prop</span><span class="sc8">=</span><span class="sc3">sum</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">==</span><span class="sc5">1</span><span class="sc8">)/</span><span class="sc3">length</span><span class="sc8">(</span><span class="sc9">heart_disease</span><span class="sc8">))</span><span class="sc0">
+
+</span><span class="sc9">g4</span><span class="sc8">&lt;-</span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">data_proportion_heart_disease</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">heart_disease</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">prop</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">heart_disease</span><span class="sc8">))+</span><span class="sc9">geom_col</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">g4</span><span class="sc0">
+
+</span><span class="sc1">#Comparing the proportions of people who have different worktype who got a stroke </span><span class="sc0">
+</span><span class="sc9">data_proportion_work_type</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">df1</span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">group_by</span><span class="sc8">(</span><span class="sc9">work_type</span><span class="sc8">)</span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">summarise</span><span class="sc8">(</span><span class="sc9">prop</span><span class="sc8">=</span><span class="sc3">sum</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">==</span><span class="sc5">1</span><span class="sc8">)/</span><span class="sc3">length</span><span class="sc8">(</span><span class="sc9">work_type</span><span class="sc8">))</span><span class="sc0">
+
+</span><span class="sc9">g5</span><span class="sc8">&lt;-</span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">data_proportion_work_type</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">work_type</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">prop</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">work_type</span><span class="sc8">))+</span><span class="sc9">geom_col</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">g5</span><span class="sc0">
+
+</span><span class="sc3">names</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Comparing the proportion of people who have different resident type </span><span class="sc0">
+</span><span class="sc9">data_proportion_Residence_type</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">df1</span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">group_by</span><span class="sc8">(</span><span class="sc9">Residence_type</span><span class="sc8">)</span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">summarise</span><span class="sc8">(</span><span class="sc9">prop</span><span class="sc8">=</span><span class="sc3">sum</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">==</span><span class="sc5">1</span><span class="sc8">)/</span><span class="sc3">length</span><span class="sc8">(</span><span class="sc9">Residence_type</span><span class="sc8">))</span><span class="sc0">
+
+</span><span class="sc9">g5</span><span class="sc8">&lt;-</span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">data_proportion_Residence_type</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">Residence_type</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">prop</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">Residence_type</span><span class="sc8">))+</span><span class="sc9">geom_col</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">g5</span><span class="sc0">
+
+</span><span class="sc1">#comparing people with different smoking status type who got stroke </span><span class="sc0">
+
+</span><span class="sc9">data_proportion_smoking_status</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">df1</span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">group_by</span><span class="sc8">(</span><span class="sc9">smoking_status</span><span class="sc8">)</span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">summarise</span><span class="sc8">(</span><span class="sc9">prop</span><span class="sc8">=</span><span class="sc3">sum</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">==</span><span class="sc5">1</span><span class="sc8">)/</span><span class="sc3">length</span><span class="sc8">(</span><span class="sc9">smoking_status</span><span class="sc8">))</span><span class="sc0">
+
+
+</span><span class="sc9">g6</span><span class="sc8">&lt;-</span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">data_proportion_smoking_status</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">smoking_status</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">prop</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">smoking_status</span><span class="sc8">))+</span><span class="sc9">geom_col</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">g6</span><span class="sc0">
+
+</span><span class="sc1">#Plotting together in the form of a grid </span><span class="sc0">
+</span><span class="sc9">grid.arrange</span><span class="sc8">(</span><span class="sc9">grobs</span><span class="sc8">=</span><span class="sc3">list</span><span class="sc8">(</span><span class="sc9">g1</span><span class="sc0">,</span><span class="sc9">g2</span><span class="sc0">,</span><span class="sc9">g3</span><span class="sc0">,</span><span class="sc9">g4</span><span class="sc0">,</span><span class="sc9">g5</span><span class="sc0">,</span><span class="sc9">g6</span><span class="sc8">)</span><span class="sc0">,</span><span class="sc3">ncol</span><span class="sc8">=</span><span class="sc5">3</span><span class="sc0">, </span><span class="sc9">top</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"Proportion of Strokes for Each Factor"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Gender and the residence type does not have much difference in occurrence of strokes. Those with hypertension, heart diseases and those who have been married have higher proportion of strokes </span><span class="sc0">
+
+</span><span class="sc1">#Children and the people who have never worked have very low occurrence of stroke. People who are self_employed have a greater proportion of getting the stroke.</span><span class="sc0">
+
+</span><span class="sc1">#People who are currently smoking also has a greater percentage of getting the stroke when compared to the rest of the population</span><span class="sc0">
+
+</span><span class="sc1">#Removing other from the dataframe </span><span class="sc0">
+</span><span class="sc1">#df1&lt;- df1%&gt;%</span><span class="sc0">
+</span><span class="sc1">#  filter(gender!="Other")</span><span class="sc0">
+
+</span><span class="sc1">#df2&lt;- df2%&gt;%</span><span class="sc0">
+</span><span class="sc1">#  filter(gender!="Other")</span><span class="sc0">
+
+</span><span class="sc1">#df_mean&lt;- df_mean%&gt;%</span><span class="sc0">
+</span><span class="sc1">#  filter(gender!="Other")</span><span class="sc0">
+
+
+
+</span><span class="sc1">#Comparing the boxplot for different factors  with age </span><span class="sc0">
+</span><span class="sc9">b1</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+    </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">gender</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">age</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">b1</span><span class="sc0">
+
+</span><span class="sc9">b2</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">hypertension</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">age</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">b2</span><span class="sc0">
+
+</span><span class="sc9">b3</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">ever_married</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">age</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">b3</span><span class="sc0">
+
+</span><span class="sc9">b4</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">heart_disease</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">age</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">b4</span><span class="sc0">
+
+</span><span class="sc9">b5</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">smoking_status</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">age</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">b5</span><span class="sc0">
+
+</span><span class="sc9">b6</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">work_type</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">age</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">b6</span><span class="sc0">
+
+</span><span class="sc9">b7</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">Residence_type</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">age</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">b7</span><span class="sc0">
+
+</span><span class="sc1">#plotting the boxplots in the form of a grid </span><span class="sc0">
+</span><span class="sc9">grid.arrange</span><span class="sc8">(</span><span class="sc9">grobs</span><span class="sc8">=</span><span class="sc3">list</span><span class="sc8">(</span><span class="sc9">b1</span><span class="sc0">,</span><span class="sc9">b2</span><span class="sc0">,</span><span class="sc9">b3</span><span class="sc0">,</span><span class="sc9">b4</span><span class="sc0">,</span><span class="sc9">b5</span><span class="sc0">,</span><span class="sc9">b6</span><span class="sc0">,</span><span class="sc9">b7</span><span class="sc8">)</span><span class="sc0">,</span><span class="sc3">ncol</span><span class="sc8">=</span><span class="sc5">3</span><span class="sc0">,</span><span class="sc9">top</span><span class="sc8">=</span><span class="sc6">"Box plots for Stroke and Age across various factors"</span><span class="sc8">)</span><span class="sc0">
+
+
+</span><span class="sc1">#From the above plot we can infer that most of the people who got stroke are the people who are older</span><span class="sc0">
+</span><span class="sc1">#people who are self employed are also older than rest of the population </span><span class="sc0">
+</span><span class="sc1">#People who had stroke and smokes are younger than those who never smoked</span><span class="sc0">
+
+</span><span class="sc1">#Comparing the strokes for glucose level across various factors </span><span class="sc0">
+</span><span class="sc9">q1</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">gender</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">avg_glucose_level</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">q1</span><span class="sc0">
+
+</span><span class="sc9">q2</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">hypertension</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">avg_glucose_level</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">q2</span><span class="sc0">
+
+</span><span class="sc9">q3</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">ever_married</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">avg_glucose_level</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">q3</span><span class="sc0">
+
+</span><span class="sc9">q4</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">heart_disease</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">avg_glucose_level</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">q4</span><span class="sc0">
+
+</span><span class="sc9">q5</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">smoking_status</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">avg_glucose_level</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">q5</span><span class="sc0">
+
+</span><span class="sc9">q6</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">work_type</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">avg_glucose_level</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">q6</span><span class="sc0">
+
+</span><span class="sc9">q7</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">Residence_type</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">avg_glucose_level</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">q7</span><span class="sc0">
+
+</span><span class="sc1">#plotting the boxplots in the form of a grid </span><span class="sc0">
+</span><span class="sc9">grid.arrange</span><span class="sc8">(</span><span class="sc9">grobs</span><span class="sc8">=</span><span class="sc3">list</span><span class="sc8">(</span><span class="sc9">q1</span><span class="sc0">,</span><span class="sc9">q2</span><span class="sc0">,</span><span class="sc9">q3</span><span class="sc0">,</span><span class="sc9">q4</span><span class="sc0">,</span><span class="sc9">q5</span><span class="sc0">,</span><span class="sc9">q6</span><span class="sc0">,</span><span class="sc9">q7</span><span class="sc8">)</span><span class="sc0">,</span><span class="sc3">ncol</span><span class="sc8">=</span><span class="sc5">3</span><span class="sc0">,</span><span class="sc9">top</span><span class="sc8">=</span><span class="sc6">"Box plots for Average Glucose level across various factors"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1"># We can see that the glucose level is right skewed </span><span class="sc0">
+</span><span class="sc1">#The Inter Quartile Range is higher for people who gets stroke </span><span class="sc0">
+
+</span><span class="sc1">#Comparing the strokes for BMI across various factors </span><span class="sc0">
+</span><span class="sc9">w1</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">gender</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">bmi</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">w1</span><span class="sc0">
+
+</span><span class="sc9">w2</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">hypertension</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">bmi</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">w2</span><span class="sc0">
+
+</span><span class="sc9">w3</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">ever_married</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">bmi</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">w3</span><span class="sc0">
+
+</span><span class="sc9">w4</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">heart_disease</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">bmi</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">w4</span><span class="sc0">
+
+</span><span class="sc9">w5</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">smoking_status</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">bmi</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">w5</span><span class="sc0">
+
+</span><span class="sc9">w6</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">work_type</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">bmi</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">w6</span><span class="sc0">
+
+</span><span class="sc9">w7</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">Residence_type</span><span class="sc0">,</span><span class="sc9">y</span><span class="sc8">=</span><span class="sc9">bmi</span><span class="sc0">,</span><span class="sc9">color</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_boxplot</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">w7</span><span class="sc0">
+
+</span><span class="sc1">#Creating the grid for all the plots </span><span class="sc0">
+</span><span class="sc9">grid.arrange</span><span class="sc8">(</span><span class="sc9">grobs</span><span class="sc8">=</span><span class="sc3">list</span><span class="sc8">(</span><span class="sc9">w1</span><span class="sc0">,</span><span class="sc9">w2</span><span class="sc0">,</span><span class="sc9">w3</span><span class="sc0">,</span><span class="sc9">w4</span><span class="sc0">,</span><span class="sc9">w5</span><span class="sc0">,</span><span class="sc9">w6</span><span class="sc0">,</span><span class="sc9">w7</span><span class="sc8">)</span><span class="sc0">,</span><span class="sc3">ncol</span><span class="sc8">=</span><span class="sc5">3</span><span class="sc0">,</span><span class="sc9">top</span><span class="sc8">=</span><span class="sc6">"Boxplots for Stroke and BMI accross various factors"</span><span class="sc8">)</span><span class="sc0">
+
+
+</span><span class="sc1">#There is no much difference between the person who got stroke and person who didn't get stroke. Even the BMI is right skewed.</span><span class="sc0">
+
+</span><span class="sc1">#plotting the density plot and the histogram for the continuous parameters</span><span class="sc0">
+</span><span class="sc9">e1</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">age</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_density</span><span class="sc8">(</span><span class="sc9">alpha</span><span class="sc8">=</span><span class="sc5">0.5</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">e1</span><span class="sc0"> 
+</span><span class="sc9">e2</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">avg_glucose_level</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_density</span><span class="sc8">(</span><span class="sc9">alpha</span><span class="sc8">=</span><span class="sc5">0.5</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">e2</span><span class="sc0">
+</span><span class="sc9">e3</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">bmi</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_density</span><span class="sc8">(</span><span class="sc9">alpha</span><span class="sc8">=</span><span class="sc5">0.5</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">e3</span><span class="sc0">
+</span><span class="sc9">e4</span><span class="sc8">&lt;-</span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">age</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_histogram</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">e4</span><span class="sc0">
+</span><span class="sc9">e5</span><span class="sc8">&lt;-</span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">avg_glucose_level</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_histogram</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">e5</span><span class="sc0">
+</span><span class="sc9">e6</span><span class="sc8">&lt;-</span><span class="sc9">ggplot</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc0">,</span><span class="sc9">aes</span><span class="sc8">(</span><span class="sc9">x</span><span class="sc8">=</span><span class="sc9">bmi</span><span class="sc0">,</span><span class="sc9">fill</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">))+</span><span class="sc9">geom_histogram</span><span class="sc8">()</span><span class="sc0">
+</span><span class="sc9">e6</span><span class="sc0">
+
+</span><span class="sc9">grid.arrange</span><span class="sc8">(</span><span class="sc9">grobs</span><span class="sc8">=</span><span class="sc3">list</span><span class="sc8">(</span><span class="sc9">e1</span><span class="sc0">,</span><span class="sc9">e2</span><span class="sc0">,</span><span class="sc9">e3</span><span class="sc0">,</span><span class="sc9">e4</span><span class="sc0">,</span><span class="sc9">e5</span><span class="sc0">,</span><span class="sc9">e6</span><span class="sc8">)</span><span class="sc0">,</span><span class="sc3">nrow</span><span class="sc8">=</span><span class="sc5">3</span><span class="sc0">, </span><span class="sc9">top</span><span class="sc8">=</span><span class="sc6">" Distribution of continuous variable"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#From this plots we can infer that the number of stroke increases as the age increases, </span><span class="sc0">
+</span><span class="sc1">#From the histogram we cam infer that the average number of strokes is bimodal for avg_glucose_level for both distribution of people who received stroke and who didn't receive stroke</span><span class="sc0">
+
+</span><span class="sc1">#Correlation matrix</span><span class="sc0">
+</span><span class="sc9">df4</span><span class="sc8">&lt;-</span><span class="sc9">dummy.data.frame</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc3">cor</span><span class="sc8">(</span><span class="sc9">df4</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">heatmap.2</span><span class="sc8">(</span><span class="sc3">cor</span><span class="sc8">(</span><span class="sc9">df4</span><span class="sc8">)</span><span class="sc0">, </span><span class="sc9">Rowv</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc2">FALSE</span><span class="sc0">, </span><span class="sc9">Colv</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc2">FALSE</span><span class="sc0">, </span><span class="sc9">dendrogram</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"none"</span><span class="sc0">,
+          </span><span class="sc9">cellnote</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc3">round</span><span class="sc8">(</span><span class="sc9">df4</span><span class="sc0">,</span><span class="sc5">2</span><span class="sc8">)</span><span class="sc0">,
+          </span><span class="sc9">notecol</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"black"</span><span class="sc0">, </span><span class="sc9">key</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc2">FALSE</span><span class="sc0">, </span><span class="sc3">trace</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc7">'none'</span><span class="sc0">, </span><span class="sc9">margins</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">10</span><span class="sc0">,</span><span class="sc5">10</span><span class="sc8">))</span><span class="sc0">
+
+
+
+
+</span><span class="sc1">#Splitting the dataset </span><span class="sc0">
+</span><span class="sc9">set.seed</span><span class="sc8">(</span><span class="sc5">101</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#creating the test-train split </span><span class="sc0">
+</span><span class="sc9">number_of_rows</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">nrow</span><span class="sc8">(</span><span class="sc9">df1</span><span class="sc8">)</span><span class="sc0">;</span><span class="sc9">number_of_rows</span><span class="sc0">
+</span><span class="sc9">train.index</span><span class="sc8">&lt;-</span><span class="sc3">sample</span><span class="sc8">(</span><span class="sc9">number_of_rows</span><span class="sc0">,</span><span class="sc9">number_of_rows</span><span class="sc8">*</span><span class="sc5">.7</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">train.df</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc8">[</span><span class="sc9">train.index</span><span class="sc0">,</span><span class="sc8">]</span><span class="sc0">
+</span><span class="sc3">head</span><span class="sc8">(</span><span class="sc9">train.df</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">test.df</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc8">[-</span><span class="sc9">train.index</span><span class="sc0">,</span><span class="sc8">]</span><span class="sc0">
+
+</span><span class="sc3">names</span><span class="sc8">(</span><span class="sc9">test.df</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc3">nrow</span><span class="sc8">(</span><span class="sc9">train.df</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#SMOTE</span><span class="sc0">
+</span><span class="sc9">train.df</span><span class="sc8">&lt;-</span><span class="sc9">ovun.sample</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">~</span><span class="sc0">.,</span><span class="sc3">data</span><span class="sc8">=</span><span class="sc9">train.df</span><span class="sc0">,</span><span class="sc9">method</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"over"</span><span class="sc0">,</span><span class="sc9">N</span><span class="sc8">=</span><span class="sc5">6000</span><span class="sc8">)$</span><span class="sc3">data</span><span class="sc0">
+</span><span class="sc3">nrow</span><span class="sc8">(</span><span class="sc9">train.df</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">View</span><span class="sc8">(</span><span class="sc9">train.df</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">head</span><span class="sc8">(</span><span class="sc9">train.df</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">nrow</span><span class="sc8">(</span><span class="sc9">train.df</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#----------------------------------------------------------------------------------------------------------------------</span><span class="sc0">
+</span><span class="sc1">#logistic Regression with data frame which is median imputed </span><span class="sc0">
+</span><span class="sc9">glm_stroke</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">glm</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc0"> </span><span class="sc8">~</span><span class="sc0"> </span><span class="sc9">gender</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> </span><span class="sc9">age</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> </span><span class="sc9">hypertension</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> </span><span class="sc9">heart_disease</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> </span><span class="sc9">ever_married</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> 
+                    </span><span class="sc9">work_type</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> </span><span class="sc9">Residence_type</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> </span><span class="sc9">avg_glucose_level</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> </span><span class="sc9">bmi</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> </span><span class="sc9">smoking_status</span><span class="sc0">, </span><span class="sc3">data</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">train.df</span><span class="sc0">, </span><span class="sc3">family</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"binomial"</span><span class="sc8">)</span><span class="sc0"> 
+</span><span class="sc3">summary</span><span class="sc8">(</span><span class="sc9">glm_stroke</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Predicting using the logistics regression</span><span class="sc0">
+</span><span class="sc9">glm_pred</span><span class="sc8">&lt;-</span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">glm_stroke</span><span class="sc0">,</span><span class="sc9">test.df</span><span class="sc8">[</span><span class="sc0">,</span><span class="sc8">-</span><span class="sc5">11</span><span class="sc8">]</span><span class="sc0">,</span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"response"</span><span class="sc8">)</span><span class="sc0">
+
+
+</span><span class="sc9">data.frame</span><span class="sc8">(</span><span class="sc9">actual</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">test.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">[</span><span class="sc5">1</span><span class="sc8">:</span><span class="sc5">10</span><span class="sc8">]</span><span class="sc0">, </span><span class="sc9">predicted</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">glm_pred</span><span class="sc8">[</span><span class="sc5">1</span><span class="sc8">:</span><span class="sc5">10</span><span class="sc8">])</span><span class="sc0">
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc3">table</span><span class="sc8">(</span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">glm_stroke</span><span class="sc0">, </span><span class="sc9">newdata</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">test.df</span><span class="sc0">, 
+                              </span><span class="sc9">type</span><span class="sc8">=</span><span class="sc6">"response"</span><span class="sc8">)</span><span class="sc0"> </span><span class="sc8">&gt;=</span><span class="sc0"> </span><span class="sc5">0.7</span><span class="sc0">, </span><span class="sc9">test.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc0"> </span><span class="sc8">==</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc8">))</span><span class="sc0">
+
+
+</span><span class="sc1">#Gains calculations</span><span class="sc0">
+</span><span class="sc9">gain</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">gains</span><span class="sc8">(</span><span class="sc9">as.numeric</span><span class="sc8">(</span><span class="sc9">test.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">, </span><span class="sc9">glm_pred</span><span class="sc0">, </span><span class="sc9">groups</span><span class="sc8">=</span><span class="sc5">10</span><span class="sc8">)</span><span class="sc0">;</span><span class="sc9">gain</span><span class="sc0">
+
+</span><span class="sc1"># plot lift chart</span><span class="sc0">
+</span><span class="sc3">plot</span><span class="sc8">(</span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">0</span><span class="sc0">,</span><span class="sc9">gain</span><span class="sc8">$</span><span class="sc9">cume.pct.of.total</span><span class="sc8">*</span><span class="sc3">sum</span><span class="sc8">(</span><span class="sc9">as.numeric</span><span class="sc8">(</span><span class="sc9">test.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)))~</span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">0</span><span class="sc0">,</span><span class="sc9">gain</span><span class="sc8">$</span><span class="sc9">cume.obs</span><span class="sc8">)</span><span class="sc0">, 
+     </span><span class="sc9">xlab</span><span class="sc8">=</span><span class="sc6">"# cases"</span><span class="sc0">, </span><span class="sc9">ylab</span><span class="sc8">=</span><span class="sc6">"Cumulative"</span><span class="sc0">, </span><span class="sc9">main</span><span class="sc8">=</span><span class="sc6">""</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc8">=</span><span class="sc6">"l"</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">lines</span><span class="sc8">(</span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">0</span><span class="sc0">,</span><span class="sc3">sum</span><span class="sc8">(</span><span class="sc9">as.numeric</span><span class="sc8">(</span><span class="sc9">test.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)))~</span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">0</span><span class="sc0">, </span><span class="sc3">dim</span><span class="sc8">(</span><span class="sc9">test.df</span><span class="sc8">)[</span><span class="sc5">1</span><span class="sc8">])</span><span class="sc0">, </span><span class="sc9">lty</span><span class="sc8">=</span><span class="sc5">2</span><span class="sc8">)</span><span class="sc0">
+
+
+</span><span class="sc1"># compute deciles and plot decile-wise chart</span><span class="sc0">
+</span><span class="sc9">heights</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">gain</span><span class="sc8">$</span><span class="sc9">mean.resp</span><span class="sc8">/</span><span class="sc3">mean</span><span class="sc8">(</span><span class="sc9">as.numeric</span><span class="sc8">(</span><span class="sc9">test.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">))</span><span class="sc0">
+</span><span class="sc9">midpoints</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">barplot</span><span class="sc8">(</span><span class="sc9">heights</span><span class="sc0">, </span><span class="sc9">names.arg</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">gain</span><span class="sc8">$</span><span class="sc9">depth</span><span class="sc0">, </span><span class="sc9">ylim</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">0</span><span class="sc0">,</span><span class="sc5">9</span><span class="sc8">)</span><span class="sc0">, 
+                     </span><span class="sc9">xlab</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"Percentile"</span><span class="sc0">, </span><span class="sc9">ylab</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"Mean Response"</span><span class="sc0">, </span><span class="sc9">main</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"Decile-wise lift chart"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1"># add labels to columns</span><span class="sc0">
+</span><span class="sc3">text</span><span class="sc8">(</span><span class="sc9">midpoints</span><span class="sc0">, </span><span class="sc9">heights</span><span class="sc8">+</span><span class="sc5">0.5</span><span class="sc0">, </span><span class="sc3">labels</span><span class="sc8">=</span><span class="sc3">round</span><span class="sc8">(</span><span class="sc9">heights</span><span class="sc0">, </span><span class="sc5">1</span><span class="sc8">)</span><span class="sc0">, </span><span class="sc9">cex</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">0.8</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc9">export.df</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">data.frame</span><span class="sc8">(</span><span class="sc9">test.df</span><span class="sc0">, </span><span class="sc9">glm_pred</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">t.df</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">data.frame</span><span class="sc8">(</span><span class="sc6">"Predicted"</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">glm_pred</span><span class="sc0">, </span><span class="sc6">"Label"</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">test.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">View</span><span class="sc8">(</span><span class="sc9">t.df</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc9">pred</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">prediction</span><span class="sc8">(</span><span class="sc9">t.df</span><span class="sc8">$</span><span class="sc9">Predicted</span><span class="sc0">, </span><span class="sc9">t.df</span><span class="sc8">$</span><span class="sc9">Label</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">perf</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">performance</span><span class="sc8">(</span><span class="sc0"> </span><span class="sc9">pred</span><span class="sc0">, </span><span class="sc6">"tpr"</span><span class="sc0">, </span><span class="sc6">"fpr"</span><span class="sc0"> </span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">plot</span><span class="sc8">(</span><span class="sc0"> </span><span class="sc9">perf</span><span class="sc0"> </span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#-----------------------------------------------------------------------------------------------------------------------------</span><span class="sc0">
+</span><span class="sc1">#Model for Dropped columns</span><span class="sc0">
+</span><span class="sc9">set.seed</span><span class="sc8">(</span><span class="sc5">101</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc1">#Creating a test train split for values which is dropped instead of imputation</span><span class="sc0">
+</span><span class="sc9">number_of_rows1</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">nrow</span><span class="sc8">(</span><span class="sc9">df2</span><span class="sc8">)</span><span class="sc0">;</span><span class="sc9">number_of_rows1</span><span class="sc0">
+</span><span class="sc9">train_dropped.index</span><span class="sc8">&lt;-</span><span class="sc3">sample</span><span class="sc8">(</span><span class="sc9">number_of_rows1</span><span class="sc0">,</span><span class="sc9">number_of_rows1</span><span class="sc8">*</span><span class="sc5">.7</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">train_dropped.df</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc8">[</span><span class="sc9">train_dropped.index</span><span class="sc0">,</span><span class="sc8">]</span><span class="sc0">
+</span><span class="sc3">head</span><span class="sc8">(</span><span class="sc9">train_dropped.df</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">test_dropped.df</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc8">[-</span><span class="sc9">train_dropped.index</span><span class="sc0">,</span><span class="sc8">]</span><span class="sc0">
+
+
+</span><span class="sc1">#SMOTE</span><span class="sc0">
+</span><span class="sc9">train_dropped.df</span><span class="sc8">&lt;-</span><span class="sc9">ovun.sample</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">~</span><span class="sc0">.,</span><span class="sc3">data</span><span class="sc8">=</span><span class="sc9">train_dropped.df</span><span class="sc0">,</span><span class="sc9">method</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"over"</span><span class="sc0">,</span><span class="sc9">N</span><span class="sc8">=</span><span class="sc5">6000</span><span class="sc8">)$</span><span class="sc3">data</span><span class="sc0">
+
+</span><span class="sc1">#Creating a logistic model for dropped Stroke </span><span class="sc0">
+</span><span class="sc9">glm_stroke_dropped</span><span class="sc8">&lt;-</span><span class="sc3">glm</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">~</span><span class="sc0"> </span><span class="sc9">gender</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> </span><span class="sc9">age</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> </span><span class="sc9">hypertension</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> </span><span class="sc9">heart_disease</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> </span><span class="sc9">ever_married</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> 
+                          </span><span class="sc9">work_type</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> </span><span class="sc9">Residence_type</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> </span><span class="sc9">avg_glucose_level</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> </span><span class="sc9">bmi</span><span class="sc0"> </span><span class="sc8">+</span><span class="sc0"> </span><span class="sc9">smoking_status</span><span class="sc0">,</span><span class="sc3">data</span><span class="sc8">=</span><span class="sc9">train_dropped.df</span><span class="sc0">,</span><span class="sc3">family</span><span class="sc8">=</span><span class="sc6">"binomial"</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">summary</span><span class="sc8">(</span><span class="sc9">glm_stroke_dropped</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc9">glm_dropped_pred</span><span class="sc8">&lt;-</span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">glm_stroke_dropped</span><span class="sc0">,</span><span class="sc9">test_dropped.df</span><span class="sc8">[</span><span class="sc0">,</span><span class="sc8">-</span><span class="sc5">11</span><span class="sc8">]</span><span class="sc0">,</span><span class="sc9">type</span><span class="sc8">=</span><span class="sc6">"response"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc9">data.frame</span><span class="sc8">(</span><span class="sc9">actual</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">test_dropped.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">[</span><span class="sc5">1</span><span class="sc8">:</span><span class="sc5">10</span><span class="sc8">]</span><span class="sc0">, </span><span class="sc9">predicted</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">glm_dropped_pred</span><span class="sc8">[</span><span class="sc5">1</span><span class="sc8">:</span><span class="sc5">10</span><span class="sc8">])</span><span class="sc0">
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc3">table</span><span class="sc8">(</span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">glm_stroke_dropped</span><span class="sc0">, </span><span class="sc9">newdata</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">test_dropped.df</span><span class="sc0">, 
+                              </span><span class="sc9">type</span><span class="sc8">=</span><span class="sc6">"response"</span><span class="sc8">)</span><span class="sc0"> </span><span class="sc8">&gt;</span><span class="sc0"> </span><span class="sc5">0.65</span><span class="sc0">, </span><span class="sc9">test_dropped.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc0"> </span><span class="sc8">==</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc8">))</span><span class="sc0">
+
+</span><span class="sc9">r.dt</span><span class="sc8">&lt;-</span><span class="sc9">roc</span><span class="sc8">(</span><span class="sc9">test_dropped.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc0">,</span><span class="sc9">glm_dropped_pred</span><span class="sc0">,</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">plot</span><span class="sc8">(</span><span class="sc9">r.dt</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">auc</span><span class="sc8">(</span><span class="sc9">r.dt</span><span class="sc8">)</span><span class="sc0">
+.</span><span class="sc1">#--------------------------------------------------------------------------------------------------------------------------------------------</span><span class="sc0">
+</span><span class="sc1">#model for mean imputations</span><span class="sc0">
+</span><span class="sc9">set.seed</span><span class="sc8">(</span><span class="sc5">101</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc1">#Creating a train test split for which is mean imputed</span><span class="sc0">
+</span><span class="sc9">number_of_rows2</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">nrow</span><span class="sc8">(</span><span class="sc9">df_mean</span><span class="sc8">)</span><span class="sc0">;</span><span class="sc9">number_of_rows2</span><span class="sc0">
+</span><span class="sc9">train_mean.index</span><span class="sc8">&lt;-</span><span class="sc3">sample</span><span class="sc8">(</span><span class="sc9">number_of_rows2</span><span class="sc0">,</span><span class="sc9">number_of_rows2</span><span class="sc8">*</span><span class="sc5">.7</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">train_mean.df</span><span class="sc8">&lt;-</span><span class="sc9">df_mean</span><span class="sc8">[</span><span class="sc9">train_mean.index</span><span class="sc0">,</span><span class="sc8">]</span><span class="sc0">
+</span><span class="sc3">head</span><span class="sc8">(</span><span class="sc9">train_mean.df</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">test_mean.df</span><span class="sc8">&lt;-</span><span class="sc9">df1</span><span class="sc8">[-</span><span class="sc9">train_mean.index</span><span class="sc0">,</span><span class="sc8">]</span><span class="sc0">
+
+</span><span class="sc1">#Smote</span><span class="sc0">
+</span><span class="sc9">train_mean.df</span><span class="sc8">&lt;-</span><span class="sc9">ovun.sample</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">~</span><span class="sc0">.,</span><span class="sc3">data</span><span class="sc8">=</span><span class="sc9">train_mean.df</span><span class="sc0">,</span><span class="sc9">method</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"over"</span><span class="sc0">,</span><span class="sc9">N</span><span class="sc8">=</span><span class="sc5">6000</span><span class="sc8">)$</span><span class="sc3">data</span><span class="sc0">
+
+
+</span><span class="sc1">#Creation  of model </span><span class="sc0">
+</span><span class="sc9">glm_stroke_mean</span><span class="sc8">&lt;-</span><span class="sc3">glm</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">~</span><span class="sc0">.,</span><span class="sc3">data</span><span class="sc8">=</span><span class="sc9">train_mean.df</span><span class="sc0">,</span><span class="sc3">family</span><span class="sc8">=</span><span class="sc7">'binomial'</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc3">summary</span><span class="sc8">(</span><span class="sc9">glm_stroke_mean</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Making predictions</span><span class="sc0">
+</span><span class="sc9">glm_mean_pred</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">glm_stroke_mean</span><span class="sc0">,</span><span class="sc9">test_mean.df</span><span class="sc8">[</span><span class="sc0">,</span><span class="sc8">-</span><span class="sc5">11</span><span class="sc8">]</span><span class="sc0">,</span><span class="sc9">type</span><span class="sc8">=</span><span class="sc6">"response"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc9">data.frame</span><span class="sc8">(</span><span class="sc9">actual</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">test_mean.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">[</span><span class="sc5">1</span><span class="sc8">:</span><span class="sc5">10</span><span class="sc8">]</span><span class="sc0">, </span><span class="sc9">predicted</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">glm_mean_pred</span><span class="sc8">[</span><span class="sc5">1</span><span class="sc8">:</span><span class="sc5">10</span><span class="sc8">])</span><span class="sc0">
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc3">table</span><span class="sc8">(</span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">glm_stroke_mean</span><span class="sc0">, </span><span class="sc9">newdata</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">test_mean.df</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc8">=</span><span class="sc6">"response"</span><span class="sc8">)</span><span class="sc0"> </span><span class="sc8">&gt;</span><span class="sc0"> </span><span class="sc5">0.65</span><span class="sc0">, </span><span class="sc9">test_mean.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc0"> </span><span class="sc8">==</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc8">))</span><span class="sc0">
+
+</span><span class="sc1">#Gains calculations</span><span class="sc0">
+</span><span class="sc9">gain</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">gains</span><span class="sc8">(</span><span class="sc9">as.numeric</span><span class="sc8">(</span><span class="sc9">test_mean.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">, </span><span class="sc9">glm_mean_pred</span><span class="sc0">, </span><span class="sc9">groups</span><span class="sc8">=</span><span class="sc5">10</span><span class="sc8">)</span><span class="sc0">;</span><span class="sc9">gain</span><span class="sc0">
+
+</span><span class="sc1"># plot lift chart</span><span class="sc0">
+</span><span class="sc3">plot</span><span class="sc8">(</span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">0</span><span class="sc0">,</span><span class="sc9">gain</span><span class="sc8">$</span><span class="sc9">cume.pct.of.total</span><span class="sc8">*</span><span class="sc3">sum</span><span class="sc8">(</span><span class="sc9">as.numeric</span><span class="sc8">(</span><span class="sc9">test_mean.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)))~</span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">0</span><span class="sc0">,</span><span class="sc9">gain</span><span class="sc8">$</span><span class="sc9">cume.obs</span><span class="sc8">)</span><span class="sc0">, 
+     </span><span class="sc9">xlab</span><span class="sc8">=</span><span class="sc6">"# cases"</span><span class="sc0">, </span><span class="sc9">ylab</span><span class="sc8">=</span><span class="sc6">"Cumulative"</span><span class="sc0">, </span><span class="sc9">main</span><span class="sc8">=</span><span class="sc6">""</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc8">=</span><span class="sc6">"l"</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">lines</span><span class="sc8">(</span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">0</span><span class="sc0">,</span><span class="sc3">sum</span><span class="sc8">(</span><span class="sc9">as.numeric</span><span class="sc8">(</span><span class="sc9">test_mean.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)))~</span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">0</span><span class="sc0">, </span><span class="sc3">dim</span><span class="sc8">(</span><span class="sc9">test_mean.df</span><span class="sc8">)[</span><span class="sc5">1</span><span class="sc8">])</span><span class="sc0">, </span><span class="sc9">lty</span><span class="sc8">=</span><span class="sc5">2</span><span class="sc8">)</span><span class="sc0">
+
+
+</span><span class="sc1"># compute deciles and plot decile-wise chart</span><span class="sc0">
+</span><span class="sc9">heights</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">gain</span><span class="sc8">$</span><span class="sc9">mean.resp</span><span class="sc8">/</span><span class="sc3">mean</span><span class="sc8">(</span><span class="sc9">as.numeric</span><span class="sc8">(</span><span class="sc9">test_mean.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">))</span><span class="sc0">
+</span><span class="sc9">midpoints</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">barplot</span><span class="sc8">(</span><span class="sc9">heights</span><span class="sc0">, </span><span class="sc9">names.arg</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">gain</span><span class="sc8">$</span><span class="sc9">depth</span><span class="sc0">, </span><span class="sc9">ylim</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">0</span><span class="sc0">,</span><span class="sc5">9</span><span class="sc8">)</span><span class="sc0">, 
+                     </span><span class="sc9">xlab</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"Percentile"</span><span class="sc0">, </span><span class="sc9">ylab</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"Mean Response"</span><span class="sc0">, </span><span class="sc9">main</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"Decile-wise lift chart"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1"># add labels to columns</span><span class="sc0">
+</span><span class="sc3">text</span><span class="sc8">(</span><span class="sc9">midpoints</span><span class="sc0">, </span><span class="sc9">heights</span><span class="sc8">+</span><span class="sc5">0.5</span><span class="sc0">, </span><span class="sc3">labels</span><span class="sc8">=</span><span class="sc3">round</span><span class="sc8">(</span><span class="sc9">heights</span><span class="sc0">, </span><span class="sc5">1</span><span class="sc8">)</span><span class="sc0">, </span><span class="sc9">cex</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">0.8</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc9">export.df</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">data.frame</span><span class="sc8">(</span><span class="sc9">test.df</span><span class="sc0">, </span><span class="sc9">glm_pred</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">t.df</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">data.frame</span><span class="sc8">(</span><span class="sc6">"Predicted"</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">glm_pred</span><span class="sc0">, </span><span class="sc6">"Label"</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">test.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc9">pred</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">prediction</span><span class="sc8">(</span><span class="sc9">t.df</span><span class="sc8">$</span><span class="sc9">Predicted</span><span class="sc0">, </span><span class="sc9">t.df</span><span class="sc8">$</span><span class="sc9">Label</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">perf</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">performance</span><span class="sc8">(</span><span class="sc0"> </span><span class="sc9">pred</span><span class="sc0">, </span><span class="sc6">"tpr"</span><span class="sc0">, </span><span class="sc6">"fpr"</span><span class="sc0"> </span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">plot</span><span class="sc8">(</span><span class="sc0"> </span><span class="sc9">perf</span><span class="sc0"> </span><span class="sc8">)</span><span class="sc0">
+
+
+
+</span><span class="sc1">#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span><span class="sc0">
+</span><span class="sc1">#Random Forest</span><span class="sc0">
+</span><span class="sc1">#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span><span class="sc0">
+</span><span class="sc3">library</span><span class="sc8">(</span><span class="sc6">"metrics"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Random forest with dropped values </span><span class="sc0">
+</span><span class="sc9">rf_dropped</span><span class="sc8">&lt;-</span><span class="sc9">randomForest</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc0"> </span><span class="sc8">~</span><span class="sc0"> ., </span><span class="sc3">data</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">train_dropped.df</span><span class="sc0">, 
+                          </span><span class="sc9">ntree</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1000</span><span class="sc0">, </span><span class="sc9">mtry</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">10</span><span class="sc0">, </span><span class="sc9">nodesize</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">importance</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc2">TRUE</span><span class="sc0">, </span><span class="sc9">sampsize</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">3000</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#plot the variables by order of importance</span><span class="sc0">
+</span><span class="sc9">varImpPlot</span><span class="sc8">(</span><span class="sc9">rf_dropped</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#create a confusion matrix</span><span class="sc0">
+</span><span class="sc9">rf_dropped.pred</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">rf_dropped</span><span class="sc0">, </span><span class="sc9">test_dropped.df</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc9">rf_dropped.pred</span><span class="sc0">, </span><span class="sc9">test_dropped.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#RMSE(rf_dropped.pred,test_dropped.df$stroke)</span><span class="sc0">
+</span><span class="sc9">rf_dropped.pred</span><span class="sc0">
+</span><span class="sc9">test_dropped.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc0">
+</span><span class="sc9">default_rmse</span><span class="sc8">&lt;-</span><span class="sc3">mean</span><span class="sc8">((</span><span class="sc9">as.numeric</span><span class="sc8">(</span><span class="sc9">rf_dropped.pred</span><span class="sc8">)-</span><span class="sc9">as.numeric</span><span class="sc8">(</span><span class="sc9">test_dropped.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">))^</span><span class="sc5">2</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">default_rmse</span><span class="sc0">
+
+</span><span class="sc9">n_features</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">length</span><span class="sc8">(</span><span class="sc3">setdiff</span><span class="sc8">(</span><span class="sc3">names</span><span class="sc8">(</span><span class="sc9">train_dropped.df</span><span class="sc8">)</span><span class="sc0">, </span><span class="sc6">"stroke"</span><span class="sc8">))</span><span class="sc0">;</span><span class="sc9">n_features</span><span class="sc0">
+
+</span><span class="sc9">hyper_grid</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">expand.grid</span><span class="sc8">(</span><span class="sc0">
+  </span><span class="sc9">mtry</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc3">floor</span><span class="sc8">(</span><span class="sc9">n_features</span><span class="sc0"> </span><span class="sc8">*</span><span class="sc0"> </span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">.05</span><span class="sc0">, </span><span class="sc5">.15</span><span class="sc0">, </span><span class="sc5">.25</span><span class="sc0">, </span><span class="sc5">.333</span><span class="sc0">, </span><span class="sc5">.4</span><span class="sc0">,</span><span class="sc5">.5</span><span class="sc8">))</span><span class="sc0">,
+  </span><span class="sc9">min.node.size</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">1</span><span class="sc0">, </span><span class="sc5">3</span><span class="sc0">, </span><span class="sc5">5</span><span class="sc0">, </span><span class="sc5">10</span><span class="sc8">)</span><span class="sc0">, 
+  </span><span class="sc3">replace</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc3">c</span><span class="sc8">(</span><span class="sc2">TRUE</span><span class="sc0">, </span><span class="sc2">FALSE</span><span class="sc8">)</span><span class="sc0">,                               
+  </span><span class="sc9">sample.fraction</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">.5</span><span class="sc0">, </span><span class="sc5">.63</span><span class="sc0">, </span><span class="sc5">.8</span><span class="sc8">)</span><span class="sc0">,                       
+  </span><span class="sc9">rmse</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc2">NA</span><span class="sc0">                                               
+</span><span class="sc8">)</span><span class="sc0">
+
+
+
+</span><span class="sc2">for</span><span class="sc8">(</span><span class="sc9">i</span><span class="sc0"> </span><span class="sc2">in</span><span class="sc0"> </span><span class="sc9">seq_len</span><span class="sc8">(</span><span class="sc3">nrow</span><span class="sc8">(</span><span class="sc9">hyper_grid</span><span class="sc8">)))</span><span class="sc0"> </span><span class="sc8">{</span><span class="sc0">
+  </span><span class="sc1"># fit model for ith hyperparameter combination</span><span class="sc0">
+  </span><span class="sc9">fit</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">ranger</span><span class="sc8">(</span><span class="sc0">
+    </span><span class="sc3">formula</span><span class="sc0">         </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">stroke</span><span class="sc0"> </span><span class="sc8">~</span><span class="sc0"> ., 
+    </span><span class="sc3">data</span><span class="sc0">            </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">train_dropped.df</span><span class="sc0">,
+    </span><span class="sc9">num.trees</span><span class="sc0">       </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">n_features</span><span class="sc0"> </span><span class="sc8">*</span><span class="sc0"> </span><span class="sc5">10</span><span class="sc0">,
+    </span><span class="sc9">mtry</span><span class="sc0">            </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">hyper_grid</span><span class="sc8">$</span><span class="sc9">mtry</span><span class="sc8">[</span><span class="sc9">i</span><span class="sc8">]</span><span class="sc0">,
+    </span><span class="sc9">min.node.size</span><span class="sc0">   </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">hyper_grid</span><span class="sc8">$</span><span class="sc9">min.node.size</span><span class="sc8">[</span><span class="sc9">i</span><span class="sc8">]</span><span class="sc0">,
+    </span><span class="sc3">replace</span><span class="sc0">         </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">hyper_grid</span><span class="sc8">$</span><span class="sc3">replace</span><span class="sc8">[</span><span class="sc9">i</span><span class="sc8">]</span><span class="sc0">,
+    </span><span class="sc9">sample.fraction</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">hyper_grid</span><span class="sc8">$</span><span class="sc9">sample.fraction</span><span class="sc8">[</span><span class="sc9">i</span><span class="sc8">]</span><span class="sc0">,
+    </span><span class="sc9">verbose</span><span class="sc0">         </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc2">FALSE</span><span class="sc0">,
+    </span><span class="sc9">seed</span><span class="sc0">            </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">42</span><span class="sc0">,
+    </span><span class="sc9">respect.unordered.factors</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc7">'order'</span><span class="sc0">
+  </span><span class="sc8">)</span><span class="sc0">
+  </span><span class="sc9">hyper_grid</span><span class="sc8">$</span><span class="sc9">rmse</span><span class="sc8">[</span><span class="sc9">i</span><span class="sc8">]</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">sqrt</span><span class="sc8">(</span><span class="sc9">fit</span><span class="sc8">$</span><span class="sc9">prediction.error</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc8">}</span><span class="sc0">
+
+</span><span class="sc9">hyper_grid</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">arrange</span><span class="sc8">(</span><span class="sc9">rmse</span><span class="sc8">)</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc9">mutate</span><span class="sc8">(</span><span class="sc9">perc_gain</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc8">(</span><span class="sc9">default_rmse</span><span class="sc0"> </span><span class="sc8">-</span><span class="sc0"> </span><span class="sc9">rmse</span><span class="sc8">)</span><span class="sc0"> </span><span class="sc8">/</span><span class="sc0"> </span><span class="sc9">default_rmse</span><span class="sc0"> </span><span class="sc8">*</span><span class="sc0"> </span><span class="sc5">100</span><span class="sc8">)</span><span class="sc0"> </span><span class="sc10">%&gt;%</span><span class="sc0">
+  </span><span class="sc3">head</span><span class="sc8">(</span><span class="sc5">100</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#------------------------------------------------------------------------------------------------------------------</span><span class="sc0">
+
+</span><span class="sc1">#Random Forest with Median Imputation </span><span class="sc0">
+</span><span class="sc9">rf_median</span><span class="sc8">&lt;-</span><span class="sc9">randomForest</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc0"> </span><span class="sc8">~</span><span class="sc0"> ., </span><span class="sc3">data</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">train.df</span><span class="sc0">, 
+                         </span><span class="sc9">ntree</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1000</span><span class="sc0">, </span><span class="sc9">mtry</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">10</span><span class="sc0">, </span><span class="sc9">nodesize</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">importance</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc2">TRUE</span><span class="sc0">, </span><span class="sc9">sampsize</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">3000</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#plot the variables by order of importance</span><span class="sc0">
+</span><span class="sc9">varImpPlot</span><span class="sc8">(</span><span class="sc9">rf_median</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#create a confusion matrix</span><span class="sc0">
+</span><span class="sc9">rf_median.pred</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">rf_median</span><span class="sc0">, </span><span class="sc9">test.df</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc9">rf_median.pred</span><span class="sc0">, </span><span class="sc9">test.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+
+
+</span><span class="sc1">#Random Forest with Mean Imputation</span><span class="sc0">
+</span><span class="sc9">rf_mean</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">randomForest</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">~</span><span class="sc0">.,</span><span class="sc3">data</span><span class="sc8">=</span><span class="sc9">train_mean.df</span><span class="sc0">,</span><span class="sc9">ntree</span><span class="sc8">=</span><span class="sc5">1000</span><span class="sc0">,</span><span class="sc9">mtry</span><span class="sc8">=</span><span class="sc5">10</span><span class="sc0">,</span><span class="sc9">nodesize</span><span class="sc8">=</span><span class="sc5">1</span><span class="sc0">,</span><span class="sc9">importance</span><span class="sc8">=</span><span class="sc2">TRUE</span><span class="sc0">,</span><span class="sc9">sampsize</span><span class="sc8">=</span><span class="sc5">3000</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#plotting the variable by order of importance </span><span class="sc0">
+</span><span class="sc9">varImpPlot</span><span class="sc8">(</span><span class="sc9">rf_mean</span><span class="sc0">,</span><span class="sc9">type</span><span class="sc8">=</span><span class="sc5">1</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Creating a confusion matrix </span><span class="sc0">
+</span><span class="sc9">rf_mean.pred</span><span class="sc8">&lt;-</span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">rf_mean</span><span class="sc0">,</span><span class="sc9">test_mean.df</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc9">rf_mean.pred</span><span class="sc0">,</span><span class="sc9">test_mean.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+
+
+</span><span class="sc1">#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span><span class="sc0">
+</span><span class="sc1">#Decision Tree and best Pruned Tree </span><span class="sc0">
+</span><span class="sc1">#------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span><span class="sc0">
+
+</span><span class="sc1">#Creating a best pruned tree for dropped rows </span><span class="sc0">
+</span><span class="sc9">cv.ct_dropped</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">rpart</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc0"> </span><span class="sc8">~</span><span class="sc0"> ., </span><span class="sc3">data</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">train_dropped.df</span><span class="sc0">, </span><span class="sc9">method</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"class"</span><span class="sc0">, 
+               </span><span class="sc4">control</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">rpart.control</span><span class="sc8">(</span><span class="sc9">cp</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">0.001</span><span class="sc0">, </span><span class="sc9">minsplit</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">5</span><span class="sc0">, </span><span class="sc9">xval</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">10</span><span class="sc8">))</span><span class="sc0">
+
+</span><span class="sc1"># use printcp() to print the table. </span><span class="sc0">
+</span><span class="sc9">printcp</span><span class="sc8">(</span><span class="sc9">cv.ct_dropped</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">prp</span><span class="sc8">(</span><span class="sc9">cv.ct_dropped</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">extra</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">split.font</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">varlen</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc8">-</span><span class="sc5">10</span><span class="sc8">)</span><span class="sc0">  
+
+</span><span class="sc1">#prune the tree using the lowest value for xerror</span><span class="sc0">
+</span><span class="sc1">#Note: the prune function requires cp as a parameter so we need to get cp for lowest value of xerror</span><span class="sc0">
+</span><span class="sc9">pruned.ct_dropped</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">prune</span><span class="sc8">(</span><span class="sc9">cv.ct_dropped</span><span class="sc0">, 
+                   </span><span class="sc9">cp</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">cv.ct_dropped</span><span class="sc8">$</span><span class="sc9">cptable</span><span class="sc8">[</span><span class="sc9">which.min</span><span class="sc8">(</span><span class="sc9">cv.ct_dropped</span><span class="sc8">$</span><span class="sc9">cptable</span><span class="sc8">[</span><span class="sc0">,</span><span class="sc6">"xerror"</span><span class="sc8">])</span><span class="sc0">,</span><span class="sc6">"CP"</span><span class="sc8">])</span><span class="sc0">
+
+</span><span class="sc9">prp</span><span class="sc8">(</span><span class="sc9">pruned.ct_dropped</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">extra</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">split.font</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">varlen</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc8">-</span><span class="sc5">10</span><span class="sc0">,
+    </span><span class="sc9">box.col</span><span class="sc8">=</span><span class="sc3">ifelse</span><span class="sc8">(</span><span class="sc9">pruned.ct_dropped</span><span class="sc8">$</span><span class="sc3">frame</span><span class="sc8">$</span><span class="sc3">var</span><span class="sc0"> </span><span class="sc8">==</span><span class="sc0"> </span><span class="sc6">"&lt;leaf&gt;"</span><span class="sc0">, </span><span class="sc7">'gray'</span><span class="sc0">, </span><span class="sc7">'white'</span><span class="sc8">))</span><span class="sc0">  
+
+</span><span class="sc9">prune.pred_dropped</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">pruned.ct_dropped</span><span class="sc0">, </span><span class="sc9">test_dropped.df</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"class"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1"># generate confusion matrix for training data</span><span class="sc0">
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc9">prune.pred_dropped</span><span class="sc0">, </span><span class="sc9">test_dropped.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Best Pruned tree with median imputation</span><span class="sc0">
+
+</span><span class="sc1">#Creating a best pruned tree for median imputed rows </span><span class="sc0">
+</span><span class="sc9">cv.ct_median</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">rpart</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc0"> </span><span class="sc8">~</span><span class="sc0"> ., </span><span class="sc3">data</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">train.df</span><span class="sc0">, </span><span class="sc9">method</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"class"</span><span class="sc0">, 
+                       </span><span class="sc4">control</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">rpart.control</span><span class="sc8">(</span><span class="sc9">cp</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">0.001</span><span class="sc0">, </span><span class="sc9">minsplit</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">5</span><span class="sc0">, </span><span class="sc9">xval</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">10</span><span class="sc8">))</span><span class="sc0">
+
+</span><span class="sc1"># use printcp() to print the table. </span><span class="sc0">
+</span><span class="sc9">printcp</span><span class="sc8">(</span><span class="sc9">cv.ct_median</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">prp</span><span class="sc8">(</span><span class="sc9">cv.ct_median</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">extra</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">split.font</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">varlen</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc8">-</span><span class="sc5">10</span><span class="sc8">)</span><span class="sc0">  
+
+</span><span class="sc1">#prune the tree using the lowest value for xerror</span><span class="sc0">
+</span><span class="sc1">#Note: the prune function requires cp as a parameter so we need to get cp for lowest value of xerror</span><span class="sc0">
+</span><span class="sc9">pruned.ct_median</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">prune</span><span class="sc8">(</span><span class="sc9">cv.ct_median</span><span class="sc0">, 
+                           </span><span class="sc9">cp</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">cv.ct_median</span><span class="sc8">$</span><span class="sc9">cptable</span><span class="sc8">[</span><span class="sc9">which.min</span><span class="sc8">(</span><span class="sc9">cv.ct_median</span><span class="sc8">$</span><span class="sc9">cptable</span><span class="sc8">[</span><span class="sc0">,</span><span class="sc6">"xerror"</span><span class="sc8">])</span><span class="sc0">,</span><span class="sc6">"CP"</span><span class="sc8">])</span><span class="sc0">
+
+</span><span class="sc9">prp</span><span class="sc8">(</span><span class="sc9">pruned.ct_median</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">extra</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">split.font</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">varlen</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc8">-</span><span class="sc5">10</span><span class="sc0">,
+    </span><span class="sc9">box.col</span><span class="sc8">=</span><span class="sc3">ifelse</span><span class="sc8">(</span><span class="sc9">pruned.ct_median</span><span class="sc8">$</span><span class="sc3">frame</span><span class="sc8">$</span><span class="sc3">var</span><span class="sc0"> </span><span class="sc8">==</span><span class="sc0"> </span><span class="sc6">"&lt;leaf&gt;"</span><span class="sc0">, </span><span class="sc7">'gray'</span><span class="sc0">, </span><span class="sc7">'white'</span><span class="sc8">))</span><span class="sc0">  
+
+</span><span class="sc9">prune.pred_median</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">pruned.ct_median</span><span class="sc0">, </span><span class="sc9">test.df</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"class"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1"># generate confusion matrix for training data</span><span class="sc0">
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc9">prune.pred_median</span><span class="sc0">, </span><span class="sc9">test.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+
+
+</span><span class="sc1">#Best Pruned Tree with mean Imputation</span><span class="sc0">
+
+</span><span class="sc1">#Creating a best pruned tree for mean imputed rows </span><span class="sc0">
+</span><span class="sc9">cv.ct_mean</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">rpart</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc0"> </span><span class="sc8">~</span><span class="sc0"> ., </span><span class="sc3">data</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">train_mean.df</span><span class="sc0">, </span><span class="sc9">method</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"class"</span><span class="sc0">, 
+                      </span><span class="sc4">control</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">rpart.control</span><span class="sc8">(</span><span class="sc9">cp</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">0.001</span><span class="sc0">, </span><span class="sc9">minsplit</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">5</span><span class="sc0">, </span><span class="sc9">xval</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">10</span><span class="sc8">))</span><span class="sc0">
+
+</span><span class="sc1"># use printcp() to print the table. </span><span class="sc0">
+</span><span class="sc9">printcp</span><span class="sc8">(</span><span class="sc9">cv.ct_mean</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">prp</span><span class="sc8">(</span><span class="sc9">cv.ct_mean</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">extra</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">split.font</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">varlen</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc8">-</span><span class="sc5">10</span><span class="sc8">)</span><span class="sc0">  
+
+</span><span class="sc1">#prune the tree using the lowest value for xerror</span><span class="sc0">
+</span><span class="sc1">#Note: the prune function requires cp as a parameter so we need to get cp for lowest value of xerror</span><span class="sc0">
+</span><span class="sc9">pruned.ct_mean</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">prune</span><span class="sc8">(</span><span class="sc9">cv.ct_mean</span><span class="sc0">, 
+                          </span><span class="sc9">cp</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">cv.ct_mean</span><span class="sc8">$</span><span class="sc9">cptable</span><span class="sc8">[</span><span class="sc9">which.min</span><span class="sc8">(</span><span class="sc9">cv.ct_mean</span><span class="sc8">$</span><span class="sc9">cptable</span><span class="sc8">[</span><span class="sc0">,</span><span class="sc6">"xerror"</span><span class="sc8">])</span><span class="sc0">,</span><span class="sc6">"CP"</span><span class="sc8">])</span><span class="sc0">
+
+</span><span class="sc9">prp</span><span class="sc8">(</span><span class="sc9">pruned.ct_mean</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">extra</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">split.font</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">varlen</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc8">-</span><span class="sc5">10</span><span class="sc0">,
+    </span><span class="sc9">box.col</span><span class="sc8">=</span><span class="sc3">ifelse</span><span class="sc8">(</span><span class="sc9">pruned.ct_mean</span><span class="sc8">$</span><span class="sc3">frame</span><span class="sc8">$</span><span class="sc3">var</span><span class="sc0"> </span><span class="sc8">==</span><span class="sc0"> </span><span class="sc6">"&lt;leaf&gt;"</span><span class="sc0">, </span><span class="sc7">'gray'</span><span class="sc0">, </span><span class="sc7">'white'</span><span class="sc8">))</span><span class="sc0">  
+
+</span><span class="sc9">prune.pred_mean</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">pruned.ct_mean</span><span class="sc0">, </span><span class="sc9">test_mean.df</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"class"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1"># generate confusion matrix for training data</span><span class="sc0">
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc9">prune.pred_mean</span><span class="sc0">, </span><span class="sc9">test_mean.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span><span class="sc0">
+</span><span class="sc1">#Decisipn Tree</span><span class="sc0">
+</span><span class="sc1">#Median Imputation </span><span class="sc0">
+
+</span><span class="sc1">#Creation of model</span><span class="sc0">
+.</span><span class="sc9">ct_median</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">rpart</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc0"> </span><span class="sc8">~</span><span class="sc0"> ., </span><span class="sc3">data</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">train.df</span><span class="sc0">, </span><span class="sc9">method</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"class"</span><span class="sc0">, </span><span class="sc9">cp</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">0.0001</span><span class="sc0">, </span><span class="sc9">maxdepth</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">30</span><span class="sc0">, </span><span class="sc9">minsplit</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1"># print tree summary and plot tree. try different values for extra</span><span class="sc0">
+</span><span class="sc9">printcp</span><span class="sc8">(</span><span class="sc0">.</span><span class="sc9">ct_median</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">prp</span><span class="sc8">(</span><span class="sc0">.</span><span class="sc9">ct_median</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">extra</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">under</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc2">FALSE</span><span class="sc0">, </span><span class="sc9">split.font</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">varlen</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc8">-</span><span class="sc5">10</span><span class="sc8">)</span><span class="sc0">
+
+
+</span><span class="sc1"># classify records in the validation data using the classification tree.</span><span class="sc0">
+</span><span class="sc1"># set argument type = "class" in predict() to generate predicted class membership.</span><span class="sc0">
+</span><span class="sc9">ct.pred_median</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc0">.</span><span class="sc9">ct_median</span><span class="sc0">, </span><span class="sc9">test.df</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"class"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1"># generate confusion matrix for training data</span><span class="sc0">
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc9">ct.pred_median</span><span class="sc0">, </span><span class="sc9">test.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#--------------------------------------------------------------------------------------------------------------------------</span><span class="sc0">
+</span><span class="sc1">#Decision tree with Dropped rows </span><span class="sc0">
+.</span><span class="sc9">ct_dropped</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">rpart</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc0"> </span><span class="sc8">~</span><span class="sc0"> ., </span><span class="sc3">data</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">train_dropped.df</span><span class="sc0">, </span><span class="sc9">method</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"class"</span><span class="sc0">, </span><span class="sc9">cp</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">0.0001</span><span class="sc0">, </span><span class="sc9">maxdepth</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">10</span><span class="sc0">, </span><span class="sc9">minsplit</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1"># print tree summary and plot tree. try different values for extra</span><span class="sc0">
+</span><span class="sc9">printcp</span><span class="sc8">(</span><span class="sc0">.</span><span class="sc9">ct_dropped</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">prp</span><span class="sc8">(</span><span class="sc0">.</span><span class="sc9">ct_dropped</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">extra</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">under</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc2">FALSE</span><span class="sc0">, </span><span class="sc9">split.font</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">varlen</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc8">-</span><span class="sc5">10</span><span class="sc8">)</span><span class="sc0">
+
+
+</span><span class="sc1"># classify records in the validation data using the classification tree.</span><span class="sc0">
+</span><span class="sc1"># set argument type = "class" in predict() to generate predicted class membership.</span><span class="sc0">
+</span><span class="sc9">ct.pred_dropped</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc0">.</span><span class="sc9">ct_dropped</span><span class="sc0">, </span><span class="sc9">test_dropped.df</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"class"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1"># generate confusion matrix for training data</span><span class="sc0">
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc9">ct.pred_dropped</span><span class="sc0">, </span><span class="sc9">test_dropped.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#---------------------------------------------------------------------------------------------------------------------------------</span><span class="sc0">
+</span><span class="sc1">#Decision tree with mean imputation</span><span class="sc0">
+.</span><span class="sc9">ct_mean</span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc9">rpart</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc0"> </span><span class="sc8">~</span><span class="sc0"> ., </span><span class="sc3">data</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc9">train_mean.df</span><span class="sc0">, </span><span class="sc9">method</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"class"</span><span class="sc0">, </span><span class="sc9">cp</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">0.0001</span><span class="sc0">, </span><span class="sc9">maxdepth</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">10</span><span class="sc0">, </span><span class="sc9">minsplit</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">5</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1"># print tree summary and plot tree. try different values for extra</span><span class="sc0">
+</span><span class="sc9">printcp</span><span class="sc8">(</span><span class="sc0">.</span><span class="sc9">ct_mean</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc9">prp</span><span class="sc8">(</span><span class="sc0">.</span><span class="sc9">ct_mean</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">extra</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">under</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc2">FALSE</span><span class="sc0">, </span><span class="sc9">split.font</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc5">1</span><span class="sc0">, </span><span class="sc9">varlen</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc8">-</span><span class="sc5">10</span><span class="sc8">)</span><span class="sc0">
+
+
+</span><span class="sc1"># classify records in the validation data using the classification tree.</span><span class="sc0">
+</span><span class="sc1"># set argument type = "class" in predict() to generate predicted class membership.</span><span class="sc0">
+</span><span class="sc9">ct.pred_mean</span><span class="sc0"> </span><span class="sc8">&lt;-</span><span class="sc0"> </span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc0">.</span><span class="sc9">ct_mean</span><span class="sc0">, </span><span class="sc9">test_mean.df</span><span class="sc0">, </span><span class="sc9">type</span><span class="sc0"> </span><span class="sc8">=</span><span class="sc0"> </span><span class="sc6">"class"</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1"># generate confusion matrix for training data</span><span class="sc0">
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc9">ct.pred_mean</span><span class="sc0">, </span><span class="sc9">test_mean.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#---------------------------------------------------------------------------------------------------------------------------------------------------------</span><span class="sc0">
+</span><span class="sc1">#SVM</span><span class="sc0">
+</span><span class="sc1">#Creating model with missing values dropped </span><span class="sc0">
+</span><span class="sc9">model</span><span class="sc8">&lt;-</span><span class="sc9">svm</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">~</span><span class="sc0">.,</span><span class="sc3">data</span><span class="sc8">=</span><span class="sc9">train_dropped.df</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">summary</span><span class="sc8">(</span><span class="sc9">model</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#predicting values </span><span class="sc0">
+</span><span class="sc9">pred_dropped</span><span class="sc8">&lt;-</span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">model</span><span class="sc0">,</span><span class="sc9">test_dropped.df</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Confusion Matrix </span><span class="sc0">
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc9">pred_dropped</span><span class="sc0">,</span><span class="sc9">test_dropped.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Tuning model to fix the discrepancy </span><span class="sc0">
+</span><span class="sc9">tune.results</span><span class="sc8">&lt;-</span><span class="sc9">tune</span><span class="sc8">(</span><span class="sc9">svm</span><span class="sc0">,</span><span class="sc9">train.x</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">~</span><span class="sc0">.,</span><span class="sc3">data</span><span class="sc8">=</span><span class="sc9">train_dropped.df</span><span class="sc0">,</span><span class="sc3">kernel</span><span class="sc8">=</span><span class="sc6">"radial"</span><span class="sc0">,</span><span class="sc3">range</span><span class="sc8">=</span><span class="sc3">list</span><span class="sc8">(</span><span class="sc9">cost</span><span class="sc8">=</span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">1</span><span class="sc0">,</span><span class="sc5">10</span><span class="sc8">)</span><span class="sc0">,</span><span class="sc3">gamma</span><span class="sc8">=</span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">0.1</span><span class="sc0">,</span><span class="sc5">1</span><span class="sc8">)))</span><span class="sc0">
+</span><span class="sc3">summary</span><span class="sc8">(</span><span class="sc9">tune.results</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc9">model_tuned</span><span class="sc8">&lt;-</span><span class="sc9">svm</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">~</span><span class="sc0">.,</span><span class="sc3">data</span><span class="sc8">=</span><span class="sc9">train_dropped.df</span><span class="sc0">,</span><span class="sc9">cost</span><span class="sc8">=</span><span class="sc5">10</span><span class="sc0">,</span><span class="sc3">gamma</span><span class="sc8">=</span><span class="sc5">.1</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc9">pred_dropped_tuned</span><span class="sc8">&lt;-</span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">model_tuned</span><span class="sc0">,</span><span class="sc9">test_dropped.df</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc9">pred_dropped_tuned</span><span class="sc0">,</span><span class="sc9">test_dropped.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#------------------------------------------------------------------------------------</span><span class="sc0">
+
+</span><span class="sc1">#Creating model with imputing the median values </span><span class="sc0">
+</span><span class="sc9">model_median</span><span class="sc8">&lt;-</span><span class="sc9">svm</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">~</span><span class="sc0">.,</span><span class="sc3">data</span><span class="sc8">=</span><span class="sc9">train.df</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">summary</span><span class="sc8">(</span><span class="sc9">model_median</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#predicting values </span><span class="sc0">
+</span><span class="sc9">pred_median</span><span class="sc8">&lt;-</span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">model_median</span><span class="sc0">,</span><span class="sc9">test.df</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Confusion Matrix </span><span class="sc0">
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc9">pred_median</span><span class="sc0">,</span><span class="sc9">test.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Tuning model to fix the discrepancy </span><span class="sc0">
+</span><span class="sc9">tune.results_median</span><span class="sc8">&lt;-</span><span class="sc9">tune</span><span class="sc8">(</span><span class="sc9">svm</span><span class="sc0">,</span><span class="sc9">train.x</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">~</span><span class="sc0">.,</span><span class="sc3">data</span><span class="sc8">=</span><span class="sc9">train.df</span><span class="sc0">,</span><span class="sc3">kernel</span><span class="sc8">=</span><span class="sc6">"radial"</span><span class="sc0">,</span><span class="sc3">range</span><span class="sc8">=</span><span class="sc3">list</span><span class="sc8">(</span><span class="sc9">cost</span><span class="sc8">=</span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">1</span><span class="sc0">,</span><span class="sc5">10</span><span class="sc8">)</span><span class="sc0">,</span><span class="sc3">gamma</span><span class="sc8">=</span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">0.1</span><span class="sc0">,</span><span class="sc5">1</span><span class="sc8">)))</span><span class="sc0">
+</span><span class="sc3">summary</span><span class="sc8">(</span><span class="sc9">tune.results_median</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc9">model_tuned_median</span><span class="sc8">&lt;-</span><span class="sc9">svm</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">~</span><span class="sc0">.,</span><span class="sc3">data</span><span class="sc8">=</span><span class="sc9">train.df</span><span class="sc0">,</span><span class="sc9">cost</span><span class="sc8">=</span><span class="sc5">10</span><span class="sc0">,</span><span class="sc3">gamma</span><span class="sc8">=</span><span class="sc5">.1</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc9">pred_median_tuned</span><span class="sc8">&lt;-</span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">model_tuned_median</span><span class="sc0">,</span><span class="sc9">test.df</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc9">pred_median_tuned</span><span class="sc0">,</span><span class="sc9">test.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#---------------------------------------------------------------------------------------</span><span class="sc0">
+
+</span><span class="sc1">#Creating model with imputing the mean value </span><span class="sc0">
+</span><span class="sc9">model_mean</span><span class="sc8">&lt;-</span><span class="sc9">svm</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">~</span><span class="sc0">.,</span><span class="sc3">data</span><span class="sc8">=</span><span class="sc9">train_mean.df</span><span class="sc8">)</span><span class="sc0">
+</span><span class="sc3">summary</span><span class="sc8">(</span><span class="sc9">model_mean</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#predicting values </span><span class="sc0">
+</span><span class="sc9">pred_mean</span><span class="sc8">&lt;-</span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">model_mean</span><span class="sc0">,</span><span class="sc9">test.df</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Confusion Matrix </span><span class="sc0">
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc9">pred_mean</span><span class="sc0">,</span><span class="sc9">test_mean.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc1">#Tuning model to fix the discrepancy </span><span class="sc0">
+</span><span class="sc9">tune.results_mean</span><span class="sc8">&lt;-</span><span class="sc9">tune</span><span class="sc8">(</span><span class="sc9">svm</span><span class="sc0">,</span><span class="sc9">train.x</span><span class="sc8">=</span><span class="sc9">stroke</span><span class="sc8">~</span><span class="sc0">.,</span><span class="sc3">data</span><span class="sc8">=</span><span class="sc9">train_mean.df</span><span class="sc0">,</span><span class="sc3">kernel</span><span class="sc8">=</span><span class="sc6">"radial"</span><span class="sc0">,</span><span class="sc3">range</span><span class="sc8">=</span><span class="sc3">list</span><span class="sc8">(</span><span class="sc9">cost</span><span class="sc8">=</span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">1</span><span class="sc0">,</span><span class="sc5">10</span><span class="sc8">)</span><span class="sc0">,</span><span class="sc3">gamma</span><span class="sc8">=</span><span class="sc3">c</span><span class="sc8">(</span><span class="sc5">0.1</span><span class="sc0">,</span><span class="sc5">1</span><span class="sc8">)))</span><span class="sc0">
+</span><span class="sc3">summary</span><span class="sc8">(</span><span class="sc9">tune.results_mean</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc9">model_tuned_mean</span><span class="sc8">&lt;-</span><span class="sc9">svm</span><span class="sc8">(</span><span class="sc9">stroke</span><span class="sc8">~</span><span class="sc0">.,</span><span class="sc3">data</span><span class="sc8">=</span><span class="sc9">train_mean.df</span><span class="sc0">,</span><span class="sc9">cost</span><span class="sc8">=</span><span class="sc5">10</span><span class="sc0">,</span><span class="sc3">gamma</span><span class="sc8">=</span><span class="sc5">.1</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc9">pred_mean_tuned</span><span class="sc8">&lt;-</span><span class="sc3">predict</span><span class="sc8">(</span><span class="sc9">model_tuned_mean</span><span class="sc0">,</span><span class="sc9">test_mean.df</span><span class="sc8">)</span><span class="sc0">
+
+</span><span class="sc9">confusionMatrix</span><span class="sc8">(</span><span class="sc9">pred_mean_tuned</span><span class="sc0">,</span><span class="sc9">test_mean.df</span><span class="sc8">$</span><span class="sc9">stroke</span><span class="sc8">)</span><span class="sc0">
+
+
+</span></div></body>
+</html>
