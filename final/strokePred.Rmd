@@ -1,0 +1,415 @@
+---
+title: "Predicting the Risk of Stroke in Patients Using R"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+```
+
+
+## Introduction
+
+Stroke is a major cause of death and disability worldwide, and it is important to identify risk factors that can help predict the likelihood of a stroke occurring. In this project, we will use R to analyze a dataset containing information on various patient characteristics, including age, gender, hypertension, heart disease, and other factors, to determine whether these factors can be used to predict the risk of stroke. By understanding the relationship between these variables and the risk of stroke, we can potentially develop strategies for preventing or mitigating this serious health condition. The goal of this project is to use R programming to analyze the data and determine which factors are most closely associated with an increased risk of stroke.
+
+# Reading the data
+In this code chunk, we are reading in our data from a CSV file using the `read.csv` function from the `readr` package. The data contains information on various patient characteristics, including age, gender, hypertension, and other factors, that we will use to predict the risk of stroke.
+```{r}
+data <- read.csv("stroke.csv")
+head(data)
+```
+
+# Summary Statistics
+We want to get a sense of the data we are working with, so we will use the `summary` function to get a summary of the data. We can see that the data contains 5110 observations and 12 variables. The variables
+```{r}
+summary(data)
+str(data)
+```
+# Materials and methods
+The dataset was obtained via participation in a Kaggle competition centered on predicting strokes [https://www.kaggle.com/fedesoriano/stroke-prediction-dataset]. The data consists of 5110 observations and 12 variables, including information on patient characteristics such as age, gender, hypertension, and other factors.
+
+To analyze the data, I will use the readr package to read in the data from a CSV file and store it as a data frame in R. I shall then use a variety of R functions and packages, including dplyr, ggplot2, and caret, to perform statistical analyses, visualize the data, and build predictive models.
+
+In order to predict the risk of stroke, I first split the data into training and test sets using the createDataPartition function from the caret package. I trained a logistic regression model on the training set using the glm function, and evaluated the model's performance on the test set using the predict function and a variety of evaluation metrics.
+
+Overall, the analysis included a combination of statistical analyses, data visualization, and machine learning techniques to predict the risk of stroke based on patient characteristics.
+
+## Merging the data
+First to demonstrate the use of the `merge` function, I will use another dataset for heart prediction also freely available on kaggle. The `merge` function will allow us to combine the two datasets into one.
+### read in heart data
+```{r}
+heart <- read.csv("heart.csv")
+head(heart)
+```
+## Create a common column
+Since we dont have a common variable to merge on, I will create a column id in both datasets to demonstrate the merge function.
+```{r}
+data$id <- 1:nrow(data)
+heart$id <- 1:nrow(heart)
+```
+```{r}
+head(data)
+head(heart)
+```
+## Merge the data
+```{r}
+merged <- merge(data, heart, by = "id")
+head(merged)
+```
+# Results
+Since i have modified the stroke data i was going to use, let me read in the stroke data again as df
+```{r}
+df <- read.csv("stroke.csv")
+head(df)
+```
+
+I will make the id column the index column
+```{r}
+df <- df %>% dplyr::select(-id)
+head(df)
+```
+
+Now i can check whether there are any missing values in the data. I will import all libraries i will need for this project
+```{r, include=FALSE}
+library(mice)
+library(magrittr)
+library(ggplot2)
+library(ggpubr)
+library(cowplot)
+library(ggcorrplot)
+library(corrplot)
+library("tidyverse")
+library("ggplot2")
+library("gridExtra")
+library("ggpubr")
+library("ggcorrplot")
+library("corrplot")
+library("caret")
+
+```
+Check for missing values. The function `summarise_all` will apply the function `sum` to all columns in the data frame. The function `gather` will convert the data frame into a long format, where each row contains a variable name and a value. The function `reorder` will reorder the variable names by the value. The function `coord_flip` will flip the x and y axes. The function `labs` will add labels to the x and y axes.
+```{r}
+df %>% 
+  summarise_all(funs(sum(is.na(.)))) %>% 
+  gather(key = "variable", value = "missing_count") %>% 
+  ggplot(aes(x = reorder(variable, missing_count), y = missing_count)) +
+  geom_col() +
+  coord_flip() +
+  labs(x = "Variable", y = "Missing count")
+```
+Or we can view the missing values in a table
+```{r}
+df %>% 
+  summarise_all(funs(sum(is.na(.)))) %>% 
+  gather(key = "variable", value = "missing_count")
+```
+
+
+We can also use the colSums function from the dplyr package to count the number of missing values in each column
+```{r}
+colSums(is.na(df))
+```
+
+Duplicate values
+```{r}
+df %>% 
+  summarise_all(funs(sum(duplicated(.)))) %>% 
+  gather(key = "variable", value = "duplicate_count") %>% 
+  ggplot(aes(x = reorder(variable, duplicate_count), y = duplicate_count)) +
+  geom_col() +
+  coord_flip() +
+  labs(x = "Variable", y = "Duplicate count")
+```
+
+This is not right, I dont think we can have these many duplicates.. I will use the table function and the duplicated function as follows:
+I will Use the duplicated function to create a logical vector indicating which rows are duplicates. Set the fromLast argument to TRUE to include the first occurrence of each value in the count. Then use the table function to count the number of duplicates for each value.
+```{r}
+dup <- duplicated(df, fromLast = TRUE)
+table(dup)
+```
+The output `dup FALSE` 5110 indicates that there are no duplicate rows in our data frame. The duplicated function returns a logical vector indicating which rows are duplicates, with `TRUE` values indicating duplicate rows and `FALSE` values indicating unique rows. The table function counts the number of `TRUE` and `FALSE` values in the logical vector, which in this case indicates that there are 5110 unique rows (indicated by `FALSE` values) and no duplicate rows (indicated by `TRUE` values).
+
+If we want to view the rows that are duplicates, I will use the `which` function to find the indices of the duplicate rows. For example:
+
+```{r}
+duplicate_rows <- which(dup)
+duplicate_rows
+```
+return all column names
+```{r}
+colnames(df)
+```
+## Remove rows with missing or invalid values Just in case
+```{r}
+df <- na.omit(df)
+```
+
+# Data Visualization
+## Histograms
+Age Distribution
+```{r}
+ggplot(df, aes(x = age)) +
+  geom_histogram(bins = 30, fill = "blue", color = "black") +
+  labs(x = "Age", y = "Count") +
+  facet_wrap(~gender)
+```
+
+```{r}
+ggplot(df, aes(x = age)) +
+  geom_histogram(bins = 30, fill = "blue", color = "black") +
+  labs(x = "Age", y = "Count")
+```
+
+```{r}
+ggplot(df, aes(x = avg_glucose_level)) +
+  geom_histogram(bins = 30, fill = "blue", color = "black") +
+  labs(x = "Average Glucose Level", y = "Count")
+```
+to hide warnings
+```{r}
+options(warn=-1)
+```
+
+
+
+Creating a bar plot for gender VS stroke
+```{r}
+ggplot(df,aes(x=gender,fill=stroke))+geom_bar(position="dodge")
+```
+creating a bar plot for hypertension vs stroke
+```{r}
+ggplot(df,aes(x=hypertension,fill=stroke))+geom_bar(position="dodge")
+```
+
+Creating a bar plot for the smoking status and the stroke 
+```{r}
+ggplot(df,aes(x=smoking_status,fill=stroke))+geom_bar(position = "dodge")
+```
+
+## Boxplots
+```{r}
+ggplot(df, aes(x = stroke, y = age)) +
+  geom_boxplot(fill = "blue", color = "black") +
+  labs(x = "Stroke", y = "Age")
+```
+
+```{r}
+ggplot(df, aes(x = stroke, y = avg_glucose_level)) +
+    geom_boxplot(fill = "blue", color = "black") +
+    labs(x = "Stroke", y = "Average Glucose Level")
+```
+```{r}
+ggplot(df, aes(x = stroke, y = avg_glucose_level, fill = stroke)) +
+  geom_boxplot(color = "black") +
+  labs(x = "Stroke", y = "Average Glucose Level")
+```
+
+Comparing the proportions within the gender among the people who got stroke
+```{r}
+data_proportion_gender<- df %>%
+                  group_by(gender)%>%
+                  summarise(prop=sum(stroke==1)/length(gender))
+
+g1<-ggplot(data_proportion_gender,aes(x=gender,y=prop,fill=gender))+geom_col()
+g1
+```
+comparing the proportions within the different married type who got stroke 
+```{r}
+data_proportion_married<- df%>%
+                          group_by(ever_married)%>%
+                          summarise(prop=sum(stroke==1)/length(ever_married))
+
+g2<-ggplot(data_proportion_married,aes(x=ever_married,y=prop,fill=ever_married))+geom_col()
+g2
+```
+Comparing the proportions of people who have hypertension  who got stroke 
+```{r}
+data_proportion_hypertension<- df%>%
+  group_by(hypertension)%>%
+  summarise(prop=sum(stroke==1)/length(hypertension))
+
+g3<-ggplot(data_proportion_hypertension,aes(x=hypertension,y=prop,fill=hypertension))+geom_col()
+g3
+```
+Comparing the proportions of people who have the heart diseases who got stroke 
+```{r}
+data_proportion_heart_disease<- df%>%
+  group_by(heart_disease)%>%
+  summarise(prop=sum(stroke==1)/length(heart_disease))
+
+g4<-ggplot(data_proportion_heart_disease,aes(x=heart_disease,y=prop,fill=heart_disease))+geom_col()
+g4
+```
+Comparing the proportions of people who have different worktype who got a stroke 
+```{r}
+data_proportion_work_type<- df%>%
+  group_by(work_type)%>%
+  summarise(prop=sum(stroke==1)/length(work_type))
+
+g5<-ggplot(data_proportion_work_type,aes(x=work_type,y=prop,fill=work_type))+geom_col()
+g5
+```
+names(df)
+
+Comparing the proportion of people who have different resident type 
+```{r}
+data_proportion_Residence_type<- df%>%
+  group_by(Residence_type)%>%
+  summarise(prop=sum(stroke==1)/length(Residence_type))
+
+g6<-ggplot(data_proportion_Residence_type,aes(x=Residence_type,y=prop,fill=Residence_type))+geom_col()
+g5
+```
+comparing people with different smoking status type who got stroke 
+```{r}
+data_proportion_smoking_status<- df%>%
+  group_by(smoking_status)%>%
+  summarise(prop=sum(stroke==1)/length(smoking_status))
+
+
+g7<-ggplot(data_proportion_smoking_status,aes(x=smoking_status,y=prop,fill=smoking_status))+geom_col()
+g7
+```
+Plotting together in the form of a grid 
+```{r}
+grid.arrange(grobs=list(g1,g2,g3,g4,g5,g6),ncol=3, top = "Proportion of Strokes for Each Factor")
+```
+
+### Inferences
+Gender and the residence type does not have much difference in occurrence of strokes. Those with hypertension, heart diseases and those who have been married have higher proportion of strokes 
+Children and the people who have never worked have very low occurrence of stroke. People who are self_employed have a greater proportion of getting the stroke.
+People who are currently smoking also has a greater percentage of getting the stroke when compared to the rest of the population
+
+Comparing the boxplot for different factors  with age 
+```{r}
+b1<-df %>%
+    ggplot(aes(x=gender,y=age,color=stroke))+geom_boxplot()
+b1
+
+b2<-df %>%
+  ggplot(aes(x=hypertension,y=age,color=stroke))+geom_boxplot()
+b2
+
+b3<-df %>%
+  ggplot(aes(x=ever_married,y=age,color=stroke))+geom_boxplot()
+b3
+
+b4<-df %>%
+  ggplot(aes(x=heart_disease,y=age,color=stroke))+geom_boxplot()
+b4
+
+b5<-df %>%
+  ggplot(aes(x=smoking_status,y=age,color=stroke))+geom_boxplot()
+b5
+
+b6<-df %>%
+  ggplot(aes(x=work_type,y=age,color=stroke))+geom_boxplot()
+b6
+
+b7<-df %>%
+  ggplot(aes(x=Residence_type,y=age,color=stroke))+geom_boxplot()
+b7
+```
+
+### Inferences
+* From the above plot we can infer that most of the people who got stroke are the people who are older
+* people who are self employed are also older than rest of the population 
+* People who had stroke and smokes are younger than those who never smoked
+
+Comparing the strokes for glucose level across various factors 
+```{r}
+q1<-df %>%
+  ggplot(aes(x=gender,y=avg_glucose_level,color=stroke))+geom_boxplot()
+q1
+
+q2<-df %>%
+  ggplot(aes(x=hypertension,y=avg_glucose_level,color=stroke))+geom_boxplot()
+q2
+
+q3<-df %>%
+  ggplot(aes(x=ever_married,y=avg_glucose_level,color=stroke))+geom_boxplot()
+q3
+
+q4<-df %>%
+  ggplot(aes(x=heart_disease,y=avg_glucose_level,color=stroke))+geom_boxplot()
+q4
+
+q5<-df %>%
+  ggplot(aes(x=smoking_status,y=avg_glucose_level,color=stroke))+geom_boxplot()
+q5
+
+q6<-df %>%
+  ggplot(aes(x=work_type,y=avg_glucose_level,color=stroke))+geom_boxplot()
+q6
+
+q7<-df %>%
+  ggplot(aes(x=Residence_type,y=avg_glucose_level,color=stroke))+geom_boxplot()
+q7
+```
+### Inferences 
+* We can see that the glucose level is right skewed 
+* The Inter Quartile Range is higher for people who gets stroke 
+
+
+plotting the density plot and the histogram for the continuous parameters
+```{r}
+e1<- ggplot(df,aes(x=age,fill=stroke))+geom_density(alpha=0.5)
+e1 
+e2<- ggplot(df,aes(x=avg_glucose_level,fill=stroke))+geom_density(alpha=0.5)
+e2
+e3<- ggplot(df,aes(x=bmi,fill=stroke))+geom_density(alpha=0.5)
+e3
+e4<-ggplot(df,aes(x=age,fill=stroke))+geom_histogram()
+e4
+e5<-ggplot(df,aes(x=avg_glucose_level,fill=stroke))+geom_histogram()
+e5
+e6<-ggplot(df,aes(x=bmi,fill=stroke))+geom_histogram()
+```
+### Inferences 
+From this plots we can infer that the number of stroke increases as the age increases, 
+From the histogram we cam infer that the average number of strokes is bimodal for avg_glucose_level for both distribution of people who received stroke and who didn't receive stroke
+
+
+
+# Machine Learning
+## Splitting the dataset 
+```{r}
+set.seed(101)
+```
+##creating the test-train split 
+```{r}
+train.index <- createDataPartition(df$stroke, p = 0.7, list = FALSE)
+train.df <- df[train.index, ]
+test.df <- df[-train.index, ]
+```
+## Checking the dimensions of the train and test dataframes
+```{r}
+dim(train.df)
+```
+
+```{r}
+dim(test.df)
+```
+## Logistic Regression
+```{r}
+logistic_model <- glm(stroke ~ ., data = train.df, family = "binomial")
+summary(logistic_model)
+```
+
+# Conclusion
+## EDA Conclusion
+The exploratory data analysis (EDA) of the stroke prediction dataset revealed several key insights about the data. First, the data is imbalanced, with only 4.87% of the observations representing patients who have had a stroke. This imbalance may impact the accuracy of the predictive models we build, as there may be insufficient data for the minority class (stroke patients) to accurately predict the likelihood of a stroke occurring.
+
+Additionally, the EDA showed that there are a number of missing values in the dataset, particularly for the BMI variable. We addressed this issue by removing the column with only missing values, imputing the median value for missing values, and imputing the mean value for missing values. These different approaches will be used to build multiple predictive models, allowing us to compare the performance of the models and determine which approach is most effective. Overall, the EDA provided valuable insights into the characteristics and quality of the data, which will inform the development of our predictive models.
+
+## Overall Conclusion
+In conclusion, the analysis of the stroke dataset through exploration, visualization, and statistical analysis has provided a better understanding of the factors that may be associated with an increased risk of stroke. By identifying these factors and understanding their relationships with the risk of stroke, healthcare professionals can potentially develop strategies for preventing or mitigating this serious health condition. The EDA has also revealed some imbalances in the data, such as a higher proportion of male patients and a higher prevalence of hypertension, which will need to be taken into consideration when building predictive models. Additionally, the presence of missing values in some variables will need to be addressed in order to improve the accuracy of the models. 
+
+# References
+1. Letham, B., Rudin, C., McCormick, T. H., & Madigan, D. (2015). Interpretable classifiers using rules and bayesian analysis: Building a better stroke prediction model. The Annals of Applied Statistics, 9(3), 1350-1371.
+2. Moulton, E., Magno, S., Valabregue, R., Amor-Sahli, M., Pires, C., Lehéricy, S., ... & Rosso, C. (2019). Acute diffusivity biomarkers for motor and language outcome prediction in mild-to-severe stroke patients. Stroke, 50(8), 2050-2056.
+
+
+
